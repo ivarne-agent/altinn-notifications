@@ -147,8 +147,10 @@ void ConfigureServices(IServiceCollection services, IConfiguration config)
 
     services.AddSingleton(new ActivitySource(BackgroundActivitySource.Name));
 
+    // The environment variable detector comes after the attributes so that OTEL_SERVICE_NAME
+    // and OTEL_RESOURCE_ATTRIBUTES take precedence over the service name above.
     services.AddOpenTelemetry()
-        .ConfigureResource(resourceBuilder => resourceBuilder.AddAttributes(attributes))
+        .ConfigureResource(resourceBuilder => resourceBuilder.AddAttributes(attributes).AddEnvironmentVariableDetector())
         .WithMetrics(metrics =>
         {
             metrics.AddAspNetCoreInstrumentation();
